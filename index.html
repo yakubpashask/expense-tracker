@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExpenseIQ - Smart Expense Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg1:#0f172a;--bg2:#1e1b4b;--card:rgba(255,255,255,0.06);--card-border:rgba(255,255,255,0.1);--text:#e2e8f0;--text-dim:#94a3b8;--accent:#818cf8;--accent2:#a78bfa;--green:#34d399;--red:#f87171;--orange:#fb923c;--blue:#60a5fa}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);min-height:100vh;overflow-x:hidden}
+.glass{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:16px}
+.pin-screen{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a,#1e1b4b)}
+.pin-screen.hidden{display:none}
+.pin-title{font-size:1.5rem;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pin-subtitle{color:var(--text-dim);font-size:0.875rem;margin-bottom:32px}
+.pin-dots{display:flex;gap:16px;margin-bottom:40px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);transition:all 0.2s}
+.pin-dot.filled{background:var(--accent);box-shadow:0 0 12px rgba(129,140,248,0.5)}
+.pin-dot.error{border-color:var(--red);background:var(--red);animation:shake 0.4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.keypad{display:grid;grid-template-columns:repeat(3,80px);gap:12px}
+.key{width:80px;height:80px;border-radius:50%;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:1.5rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;user-select:none}
+.key:active,.key:hover{background:rgba(129,140,248,0.2);border-color:var(--accent);transform:scale(0.95)}
+.key.del{font-size:0.875rem;font-weight:500;color:var(--text-dim)}
+.key.empty{visibility:hidden;pointer-events:none}
+.dashboard.hidden{display:none}
+.header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.account-filter{display:flex;gap:6px}
+.filter-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--card-border);background:transparent;color:var(--text-dim);font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tabs{display:flex;gap:4px;padding:0 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 18px;border-radius:12px 12px 0 0;border:none;background:transparent;color:var(--text-dim);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.tab.active{background:var(--card);color:var(--text)}
+.tab-content{display:none;padding:16px;animation:fadeIn 0.3s}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{padding:16px;text-align:center}
+.stat-card .label{font-size:0.75rem;color:var(--text-dim);margin-bottom:4px}
+.stat-card .value{font-size:1.4rem;font-weight:700}
+.stat-card .sub{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
+.chart-card{padding:16px;margin-bottom:16px}
+.chart-card h3{font-size:0.9rem;font-weight:600;margin-bottom:12px}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.chart-row{grid-template-columns:1fr}}
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx-date-header{font-size:0.8rem;font-weight:600;color:var(--accent);padding:8px 0 4px}
+.tx-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)}
+.tx-left{display:flex;flex-direction:column;gap:2px}
+.tx-name{font-size:0.85rem;font-weight:500}
+.tx-cat{font-size:0.7rem;color:var(--text-dim)}
+.tx-right{display:flex;align-items:center;gap:8px}
+.tx-amount{font-size:0.9rem;font-weight:600;color:var(--red)}
+.tx-badge{font-size:0.6rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.tx-badge.y{background:rgba(129,140,248,0.2);color:var(--accent)}
+.tx-badge.w{background:rgba(251,146,60,0.2);color:var(--orange)}
+.search-bar{padding:10px 16px;border-radius:12px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;width:100%;margin-bottom:12px;outline:none}
+.search-bar:focus{border-color:var(--accent)}
+.insight-card{padding:16px;margin-bottom:12px}
+.insight-card h3{font-size:0.9rem;font-weight:600;margin-bottom:8px}
+.insight-card p,.insight-card li{font-size:0.8rem;color:var(--text-dim);line-height:1.6}
+.insight-card ul{list-style:none;padding:0}
+.insight-card li::before{content:'→ ';color:var(--accent)}
+.budget-bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.1);margin:8px 0;overflow:hidden}
+.budget-fill{height:100%;border-radius:4px;transition:width 0.5s}
+.budget-row{display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;margin-bottom:4px}
+.lock-btn{background:none;border:1px solid var(--card-border);color:var(--text-dim);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem}
+canvas{max-height:250px}
+</style>
+</head>
+<body>
+
+<div class="pin-screen" id="pinScreen">
+  <div class="pin-title">ExpenseIQ</div>
+  <div class="pin-subtitle">Enter your PIN to continue</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+  </div>
+  <div class="keypad" id="keypad">
+    <div class="key" data-key="1">1</div><div class="key" data-key="2">2</div><div class="key" data-key="3">3</div>
+    <div class="key" data-key="4">4</div><div class="key" data-key="5">5</div><div class="key" data-key="6">6</div>
+    <div class="key" data-key="7">7</div><div class="key" data-key="8">8</div><div class="key" data-key="9">9</div>
+    <div class="key empty"></div><div class="key" data-key="0">0</div><div class="key del" data-key="del">DEL</div>
+  </div>
+</div>
+
+<div class="dashboard hidden" id="dashboard">
+  <div class="header">
+    <div class="logo">ExpenseIQ</div>
+    <div class="account-filter">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="Y">Yakub</button>
+      <button class="filter-btn" data-filter="W">Wife</button>
+    </div>
+    <button class="lock-btn" onclick="lockApp()">Lock</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="trends">Trends</button>
+    <button class="tab" data-tab="transactions">Transactions</button>
+    <button class="tab" data-tab="planner">AI Planner</button>
+  </div>
+  <div class="tab-content active" id="overview">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="chart-row">
+      <div class="glass chart-card"><h3>Spending by Category</h3><canvas id="catChart"></canvas></div>
+      <div class="glass chart-card"><h3>Daily Spending</h3><canvas id="dailyChart"></canvas></div>
+    </div>
+  </div>
+  <div class="tab-content" id="trends">
+    <div class="chart-row">
+      <div class="glass chart-card"><h3>Weekly Comparison</h3><canvas id="weeklyChart"></canvas></div>
+      <div class="glass chart-card"><h3>Monthly Projection</h3><canvas id="projChart"></canvas></div>
+    </div>
+    <div class="glass chart-card"><h3>Top Spending Categories (This Week vs Last)</h3><canvas id="catCompChart"></canvas></div>
+  </div>
+  <div class="tab-content" id="transactions">
+    <input type="text" class="search-bar" id="txSearch" placeholder="Search transactions...">
+    <div class="tx-list" id="txList"></div>
+  </div>
+  <div class="tab-content" id="planner">
+    <div class="glass insight-card" id="insightsCard"></div>
+    <div class="glass insight-card" id="budgetCard"></div>
+  </div>
+</div>
+
+<script>
+const PIN='1234';
+let enteredPin='';
+const dots=document.querySelectorAll('.pin-dot');
+
+document.getElementById('keypad').addEventListener('click',e=>{
+  const k=e.target.dataset.key;
+  if(!k)return;
+  if(k==='del'){enteredPin=enteredPin.slice(0,-1);updateDots();return}
+  if(enteredPin.length>=4)return;
+  enteredPin+=k;
+  updateDots();
+  if(enteredPin.length===4){
+    if(enteredPin===PIN){
+      setTimeout(()=>{document.getElementById('pinScreen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');initDashboard()},300);
+    } else {
+      dots.forEach(d=>d.classList.add('error'));
+      setTimeout(()=>{enteredPin='';dots.forEach(d=>{d.classList.remove('error','filled')})},600);
+    }
+  }
+});
+
+function updateDots(){dots.forEach((d,i)=>{d.classList.toggle('filled',i<enteredPin.length)})}
+function lockApp(){document.getElementById('pinScreen').classList.remove('hidden');document.getElementById('dashboard').classList.add('hidden');enteredPin='';updateDots()}
+
+const TX=[
+{d:'2026-03-19',n:'Zepto',a:1057,w:'W',c:'Groceries'},
+{d:'2026-03-19',n:'Apple Dev',a:8700,w:'Y',c:'Subscriptions'},
+{d:'2026-03-19',n:'Amazon',a:184,w:'W',c:'Shopping'},
+{d:'2026-03-19',n:'Amazon',a:403,w:'W',c:'Shopping'},
+{d:'2026-03-19',n:'Paytm',a:170,w:'Y',c:'Other'},
+{d:'2026-03-19',n:'Ratnadeep',a:407,w:'Y',c:'Groceries'},
+{d:'2026-03-19',n:'Other',a:160,w:'Y',c:'Other'},
+{d:'2026-03-19',n:'DMart',a:3119,w:'Y',c:'Groceries'},
+{d:'2026-03-19',n:'Amazon',a:593,w:'W',c:'Shopping'},
+{d:'2026-03-19',n:'IRA Pharmacy',a:3387,w:'Y',c:'Healthcare'},
+{d:'2026-03-19',n:'K Divya Rani',a:500,w:'W',c:'Transfers'},
+{d:'2026-03-18',n:'Swiggy',a:343,w:'W',c:'Food Delivery'},
+{d:'2026-03-18',n:'Budiuzzama',a:30000,w:'Y',c:'Transfers'},
+{d:'2026-03-17',n:'Bajaj',a:3,w:'Y',c:'Subscriptions'},
+{d:'2026-03-17',n:'Other',a:50,w:'Y',c:'Other'},
+{d:'2026-03-17',n:'Blinkit',a:407,w:'W',c:'Groceries'},
+{d:'2026-03-17',n:'Other',a:985,w:'Y',c:'Other'},
+{d:'2026-03-17',n:'Blinkit',a:212,w:'W',c:'Groceries'},
+{d:'2026-03-16',n:'Amazon',a:404,w:'W',c:'Shopping'},
+{d:'2026-03-16',n:'Zomato',a:524,w:'W',c:'Food Delivery'},
+{d:'2026-03-16',n:'Other',a:50,w:'Y',c:'Other'},
+{d:'2026-03-16',n:'Amazon',a:1000,w:'Y',c:'Shopping'},
+{d:'2026-03-16',n:'Blinkit',a:267,w:'W',c:'Groceries'},
+{d:'2026-03-15',n:'Amazon',a:574,w:'W',c:'Shopping'},
+{d:'2026-03-15',n:'Nammi',a:80,w:'Y',c:'Other'},
+{d:'2026-03-15',n:'AbhiBus',a:1,w:'Y',c:'Other'},
+{d:'2026-03-15',n:'Amazon',a:463,w:'Y',c:'Shopping'},
+{d:'2026-03-14',n:'Parashuram',a:50,w:'W',c:'Other'},
+{d:'2026-03-14',n:'Other',a:223,w:'Y',c:'Other'},
+{d:'2026-03-14',n:'Sumanth Babu',a:1800,w:'Y',c:'Transfers'},
+{d:'2026-03-14',n:'Blinkit',a:524,w:'Y',c:'Groceries'},
+{d:'2026-03-14',n:'Jio',a:911,w:'Y',c:'Subscriptions'},
+{d:'2026-03-14',n:'Sumanth Babu',a:1750,w:'Y',c:'Transfers'},
+{d:'2026-03-14',n:'Sai Kiran',a:360,w:'Y',c:'Transfers'},
+{d:'2026-03-14',n:'Hyd Zakat Trust',a:3000,w:'Y',c:'Donations'},
+{d:'2026-03-14',n:'Blinkit',a:295,w:'W',c:'Groceries'},
+{d:'2026-03-13',n:'Other',a:500,w:'Y',c:'Other'},
+{d:'2026-03-13',n:'Meerasaheb',a:1350,w:'W',c:'Transfers'},
+{d:'2026-03-12',n:'IRA Pharmacy',a:662,w:'Y',c:'Healthcare'},
+{d:'2026-03-12',n:'Amazon',a:504,w:'W',c:'Shopping'},
+{d:'2026-03-12',n:'Paytm',a:199,w:'Y',c:'Other'},
+{d:'2026-03-12',n:'Swiggy',a:479,w:'W',c:'Food Delivery'},
+{d:'2026-03-12',n:'Zomato',a:267,w:'W',c:'Food Delivery'},
+{d:'2026-03-11',n:'Other',a:25,w:'Y',c:'Other'},
+{d:'2026-03-11',n:'MyGate',a:8000,w:'Y',c:'Rent/Housing'},
+{d:'2026-03-11',n:'Other',a:194,w:'Y',c:'Other'},
+{d:'2026-03-11',n:'Blinkit',a:229,w:'W',c:'Groceries'},
+{d:'2026-03-10',n:'Prabhakar Veg',a:120,w:'W',c:'Groceries'},
+{d:'2026-03-10',n:'Pawan Kumar',a:160,w:'W',c:'Transfers'},
+{d:'2026-03-10',n:'Blinkit',a:359,w:'W',c:'Groceries'},
+{d:'2026-03-10',n:'Sai Kumar',a:1500,w:'W',c:'Transfers'},
+{d:'2026-03-09',n:'Pista House',a:1400,w:'Y',c:'Food Delivery'},
+{d:'2026-03-09',n:'Apple',a:389,w:'Y',c:'Subscriptions'},
+{d:'2026-03-09',n:'Blinkit',a:209,w:'W',c:'Groceries'},
+{d:'2026-03-09',n:'Other',a:84,w:'Y',c:'Other'},
+{d:'2026-03-08',n:'Swiss Castle',a:535,w:'Y',c:'Food Delivery'},
+{d:'2026-03-08',n:'Blinkit',a:288,w:'W',c:'Groceries'},
+{d:'2026-03-08',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},
+{d:'2026-03-08',n:'Acko Insurance',a:1768,w:'Y',c:'Insurance'},
+{d:'2026-03-06',n:'Blinkit',a:309,w:'Y',c:'Groceries'},
+{d:'2026-03-06',n:'Ramdev',a:100,w:'Y',c:'Other'},
+{d:'2026-03-06',n:'Zepto',a:395,w:'W',c:'Groceries'},
+{d:'2026-03-06',n:'Zee',a:299,w:'W',c:'Subscriptions'},
+{d:'2026-03-06',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},
+{d:'2026-03-05',n:'Blinkit',a:281,w:'Y',c:'Groceries'},
+{d:'2026-03-05',n:'IRA Pharmacy',a:2560,w:'Y',c:'Healthcare'},
+{d:'2026-03-05',n:'Supra Fuel',a:510,w:'Y',c:'Fuel'},
+{d:'2026-03-05',n:'Zomato',a:402,w:'W',c:'Food Delivery'},
+{d:'2026-03-05',n:'Other',a:50,w:'Y',c:'Other'},
+{d:'2026-03-05',n:'Blinkit',a:340,w:'W',c:'Groceries'},
+{d:'2026-03-05',n:'Continental Hospital',a:16659,w:'Y',c:'Healthcare'},
+{d:'2026-03-05',n:'Zomato',a:382,w:'W',c:'Food Delivery'},
+{d:'2026-03-05',n:'Petrol Pump',a:3608,w:'Y',c:'Fuel'},
+{d:'2026-03-05',n:'Zomato',a:269,w:'W',c:'Food Delivery'},
+{d:'2026-03-04',n:'Crocs',a:8990,w:'Y',c:'Shopping'},
+{d:'2026-03-04',n:'Zomato',a:282,w:'W',c:'Food Delivery'},
+{d:'2026-03-04',n:'Safiya',a:10000,w:'W',c:'Transfers'},
+{d:'2026-03-04',n:'Haseena',a:20000,w:'W',c:'Transfers'},
+{d:'2026-03-04',n:'Zomato',a:453,w:'W',c:'Food Delivery'},
+{d:'2026-03-03',n:'Kethavath',a:100,w:'W',c:'Transfers'},
+{d:'2026-03-03',n:'Kurmaiah',a:80,w:'W',c:'Transfers'}
+];
+
+let currentFilter='all';
+let charts={};
+
+function filtered(){return currentFilter==='all'?TX:TX.filter(t=>t.w===currentFilter)}
+
+document.querySelectorAll('.filter-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentFilter=b.dataset.filter;
+    refreshAll();
+  });
+});
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  });
+});
+
+function initDashboard(){refreshAll()}
+
+function refreshAll(){
+  const data=filtered();
+  renderStats(data);
+  renderCatChart(data);
+  renderDailyChart(data);
+  renderWeeklyChart(data);
+  renderProjChart(data);
+  renderCatCompChart(data);
+  renderTransactions(data);
+  renderPlanner(data);
+}
+
+function fmt(n){return '₹'+n.toLocaleString('en-IN')}
+
+function renderStats(data){
+  const total=data.reduce((s,t)=>s+t.a,0);
+  const days=[...new Set(data.map(t=>t.d))].length||1;
+  const avg=Math.round(total/days);
+  const todayTx=data.filter(t=>t.d==='2026-03-19');
+  const todayTotal=todayTx.reduce((s,t)=>s+t.a,0);
+  const txCount=data.length;
+  const html=`
+    <div class="glass stat-card"><div class="label">Total Spent</div><div class="value" style="color:var(--red)">${fmt(total)}</div><div class="sub">Mar 3 – Mar 19</div></div>
+    <div class="glass stat-card"><div class="label">Daily Average</div><div class="value" style="color:var(--orange)">${fmt(avg)}</div><div class="sub">${days} days tracked</div></div>
+    <div class="glass stat-card"><div class="label">Today</div><div class="value" style="color:var(--accent)">${fmt(todayTotal)}</div><div class="sub">${todayTx.length} transactions</div></div>
+    <div class="glass stat-card"><div class="label">Transactions</div><div class="value" style="color:var(--green)">${txCount}</div><div class="sub">Total entries</div></div>`;
+  document.getElementById('statsGrid').innerHTML=html;
+}
+
+const CAT_COLORS={'Groceries':'#34d399','Shopping':'#60a5fa','Food Delivery':'#fb923c','Healthcare':'#f87171','Transfers':'#a78bfa','Subscriptions':'#818cf8','Rent/Housing':'#fbbf24','Donations':'#2dd4bf','Fuel':'#f472b6','Insurance':'#c084fc','Other':'#94a3b8'};
+
+function catTotals(data){
+  const m={};
+  data.forEach(t=>{m[t.c]=(m[t.c]||0)+t.a});
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+
+function destroyChart(key){if(charts[key]){charts[key].destroy();delete charts[key]}}
+
+function renderCatChart(data){
+  destroyChart('cat');
+  const ct=catTotals(data);
+  charts.cat=new Chart(document.getElementById('catChart'),{
+    type:'doughnut',
+    data:{labels:ct.map(c=>c[0]),datasets:[{data:ct.map(c=>c[1]),backgroundColor:ct.map(c=>CAT_COLORS[c[0]]||'#94a3b8'),borderWidth:0}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:8,usePointStyle:true,pointStyleWidth:8}}}}
+  });
+}
+
+function renderDailyChart(data){
+  destroyChart('daily');
+  const dm={};
+  data.forEach(t=>{dm[t.d]=(dm[t.d]||0)+t.a});
+  const days=Object.keys(dm).sort();
+  const labels=days.map(d=>{const p=d.split('-');return parseInt(p[2])+' Mar'});
+  charts.daily=new Chart(document.getElementById('dailyChart'),{
+    type:'bar',
+    data:{labels,datasets:[{data:days.map(d=>dm[d]),backgroundColor:'rgba(129,140,248,0.6)',borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#94a3b8',callback:v=>v>=1000?(v/1000)+'k':v},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+function renderWeeklyChart(data){
+  destroyChart('weekly');
+  const w1=data.filter(t=>t.d>='2026-03-10'&&t.d<='2026-03-16');
+  const w2=data.filter(t=>t.d>='2026-03-03'&&t.d<='2026-03-09');
+  const w3=data.filter(t=>t.d>='2026-03-17'&&t.d<='2026-03-19');
+  const wk=[w2,w1,w3];
+  const labels=['Mar 3-9','Mar 10-16','Mar 17-19'];
+  charts.weekly=new Chart(document.getElementById('weeklyChart'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Spent',data:wk.map(w=>w.reduce((s,t)=>s+t.a,0)),backgroundColor:['rgba(167,139,250,0.6)','rgba(129,140,248,0.6)','rgba(96,165,250,0.6)'],borderRadius:8,borderSkipped:false}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8'},grid:{display:false}},y:{ticks:{color:'#94a3b8',callback:v=>(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+function renderProjChart(data){
+  destroyChart('proj');
+  const total=data.reduce((s,t)=>s+t.a,0);
+  const daysElapsed=17;
+  const projected=Math.round(total/daysElapsed*31);
+  charts.proj=new Chart(document.getElementById('projChart'),{
+    type:'bar',
+    data:{labels:['Spent So Far','Projected (31 days)'],datasets:[{data:[total,projected],backgroundColor:['rgba(129,140,248,0.7)','rgba(248,113,113,0.5)'],borderRadius:8,borderSkipped:false}]},
+    options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',callback:v=>(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#94a3b8'},grid:{display:false}}}}
+  });
+}
+
+function renderCatCompChart(data){
+  destroyChart('catComp');
+  const thisW=data.filter(t=>t.d>='2026-03-10'&&t.d<='2026-03-16');
+  const lastW=data.filter(t=>t.d>='2026-03-03'&&t.d<='2026-03-09');
+  const cats=[...new Set([...thisW,...lastW].map(t=>t.c))];
+  const tw={},lw={};
+  thisW.forEach(t=>{tw[t.c]=(tw[t.c]||0)+t.a});
+  lastW.forEach(t=>{lw[t.c]=(lw[t.c]||0)+t.a});
+  charts.catComp=new Chart(document.getElementById('catCompChart'),{
+    type:'bar',
+    data:{labels:cats,datasets:[
+      {label:'This Week',data:cats.map(c=>tw[c]||0),backgroundColor:'rgba(129,140,248,0.7)',borderRadius:4},
+      {label:'Last Week',data:cats.map(c=>lw[c]||0),backgroundColor:'rgba(167,139,250,0.4)',borderRadius:4}
+    ]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8'}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#94a3b8',callback:v=>(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+
+function renderTransactions(data){
+  const search=document.getElementById('txSearch').value.toLowerCase();
+  const f=data.filter(t=>!search||t.n.toLowerCase().includes(search)||t.c.toLowerCase().includes(search));
+  const grouped={};
+  f.forEach(t=>{(grouped[t.d]=grouped[t.d]||[]).push(t)});
+  const dates=Object.keys(grouped).sort().reverse();
+  let html='';
+  dates.forEach(d=>{
+    const dt=new Date(d+'T00:00:00');
+    const label=dt.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+    const dayTotal=grouped[d].reduce((s,t)=>s+t.a,0);
+    html+=`<div class="tx-date-header">${label} &nbsp;\u00b7&nbsp; ${fmt(dayTotal)}<\/div>`;
+    grouped[d].forEach(t=>{
+      html+=`<div class="tx-item">
+        <div class="tx-left"><span class="tx-name">${t.n}<\/span><span class="tx-cat">${t.c}<\/span><\/div>
+        <div class="tx-right"><span class="tx-badge ${t.w.toLowerCase()}">${t.w==='Y'?'Yakub':'Wife'}<\/span><span class="tx-amount">${fmt(t.a)}<\/span><\/div>
+      <\/div>`;
+    });
+  });
+  document.getElementById('txList').innerHTML=html;
+}
+
+document.getElementById('txSearch').addEventListener('input',()=>renderTransactions(filtered()));
+
+function renderPlanner(data){
+  const total=data.reduce((s,t)=>s+t.a,0);
+  const ct=catTotals(data);
+  const top=ct[0];
+  const daysLeft=31-17;
+  const dailyAvg=Math.round(total/17);
+  const projected=Math.round(total/17*31);
+
+  const yakubTx=data.filter(t=>t.w==='Y');
+  const wifeTx=data.filter(t=>t.w==='W');
+  const yTotal=yakubTx.reduce((s,t)=>s+t.a,0);
+  const wTotal=wifeTx.reduce((s,t)=>s+t.a,0);
+
+  const groceries=data.filter(t=>t.c==='Groceries').reduce((s,t)=>s+t.a,0);
+  const food=data.filter(t=>t.c==='Food Delivery').reduce((s,t)=>s+t.a,0);
+  const transfers=data.filter(t=>t.c==='Transfers').reduce((s,t)=>s+t.a,0);
+
+  document.getElementById('insightsCard').innerHTML=`
+    <h3>AI Insights<\/h3>
+    <ul>
+      <li>Your biggest category is <strong>${top[0]}<\/strong> at ${fmt(top[1])} (${Math.round(top[1]/total*100)}% of total)<\/li>
+      <li>Daily average: ${fmt(dailyAvg)}/day \u2014 projected ${fmt(projected)} for March<\/li>
+      <li>Yakub spent ${fmt(yTotal)} (${Math.round(yTotal/total*100)}%) vs Wife ${fmt(wTotal)} (${Math.round(wTotal/total*100)}%)<\/li>
+      <li>Food (delivery + groceries) totals ${fmt(groceries+food)} \u2014 consider meal planning to save 15-20%<\/li>
+      <li>Transfers account for ${fmt(transfers)} \u2014 track recurring vs one-time to plan better<\/li>
+      <li>${daysLeft} days left in March. To stay under \u20b91.5L, limit daily spend to ${fmt(Math.max(0,Math.round((150000-total)/daysLeft)))}<\/li>
+    <\/ul>`;
+
+  const budgets=[
+    {cat:'Groceries',budget:12000,spent:groceries},
+    {cat:'Food Delivery',budget:8000,spent:food},
+    {cat:'Shopping',budget:15000,spent:data.filter(t=>t.c==='Shopping').reduce((s,t)=>s+t.a,0)},
+    {cat:'Healthcare',budget:10000,spent:data.filter(t=>t.c==='Healthcare').reduce((s,t)=>s+t.a,0)},
+    {cat:'Subscriptions',budget:5000,spent:data.filter(t=>t.c==='Subscriptions').reduce((s,t)=>s+t.a,0)},
+  ];
+
+  let bhtml='<h3>Budget Tracker<\/h3>';
+  budgets.forEach(b=>{
+    const pct=Math.min(100,Math.round(b.spent/b.budget*100));
+    const color=pct>90?'var(--red)':pct>70?'var(--orange)':'var(--green)';
+    bhtml+=`<div class="budget-row"><span>${b.cat}<\/span><span>${fmt(b.spent)} / ${fmt(b.budget)}<\/span><\/div>
+      <div class="budget-bar"><div class="budget-fill" style="width:${pct}%;background:${color}"></div></div>`;
+  });
+  document.getElementById('budgetCard').innerHTML=bhtml;
+}
+</script>
+</body>
+</html>
