@@ -80,34 +80,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="pin-error" id="pin-error"></div>
 </div>
 <!-- App -->
-<div id="app">
-<div class="top-bar"><div class="logo">ExpenseIQ</div><div style="font-size:11px;color:var(--dim)">Mar 2025</div></div>
+<div id="app"><div class="top-bar"><div class="logo">ExpenseIQ</div><div style="font-size:11px;color:var(--dim)">Mar 2026</div></div>
 <div class="filters">
 <div class="filter-group" id="acct-filter"></div>
 <div class="filter-group" id="period-filter"></div>
 </div>
-<div id="tab-contents"></div>
-<nav class="tab-bar" id="tab-bar"></nav>
+<div id="tab-contents"></div><nav class="tab-bar" id="tab-bar"></nav>
 </div>
 <script>
 // === DATA ===
 const TX=[
-{d:'2025-03-19',n:'Zepto',a:1057,w:'W',c:'Groceries'},{d:'2025-03-19',n:'Apple',a:8700,w:'Y',c:'Subscriptions'},{d:'2025-03-19',n:'Amazon',a:184,w:'W',c:'Shopping'},{d:'2025-03-19',n:'Amazon',a:403,w:'W',c:'Shopping'},{d:'2025-03-19',n:'Paytm',a:170,w:'Y',c:'Other'},{d:'2025-03-19',n:'Ratnadeep',a:407,w:'Y',c:'Groceries'},{d:'2025-03-19',n:'Other',a:160,w:'Y',c:'Other'},{d:'2025-03-19',n:'DMart',a:3119,w:'Y',c:'Groceries'},{d:'2025-03-19',n:'Amazon',a:593,w:'W',c:'Shopping'},{d:'2025-03-19',n:'IRA Pharmacy',a:3387,w:'Y',c:'Healthcare'},{d:'2025-03-19',n:'K Divya Rani',a:500,w:'W',c:'Transfers'},
-{d:'2025-03-18',n:'Swiggy',a:343,w:'W',c:'Food Delivery'},{d:'2025-03-18',n:'Budiuzzama',a:30000,w:'Y',c:'Transfers'},
-{d:'2025-03-17',n:'Bajaj',a:3,w:'Y',c:'Subscriptions'},{d:'2025-03-17',n:'Other',a:50,w:'Y',c:'Other'},{d:'2025-03-17',n:'Blinkit',a:407,w:'W',c:'Groceries'},{d:'2025-03-17',n:'Other',a:985,w:'Y',c:'Other'},{d:'2025-03-17',n:'Blinkit',a:212,w:'W',c:'Groceries'},
-{d:'2025-03-16',n:'Amazon',a:404,w:'W',c:'Shopping'},{d:'2025-03-16',n:'Zomato',a:524,w:'W',c:'Food Delivery'},{d:'2025-03-16',n:'Other',a:50,w:'Y',c:'Other'},{d:'2025-03-16',n:'Amazon',a:1000,w:'Y',c:'Shopping'},{d:'2025-03-16',n:'Blinkit',a:267,w:'W',c:'Groceries'},
-{d:'2025-03-15',n:'Amazon',a:574,w:'W',c:'Shopping'},{d:'2025-03-15',n:'Nammi',a:80,w:'Y',c:'Food Delivery'},{d:'2025-03-15',n:'AbhiBus',a:1,w:'Y',c:'Other'},{d:'2025-03-15',n:'Amazon',a:463,w:'Y',c:'Shopping'},
-{d:'2025-03-14',n:'Parashuram',a:50,w:'W',c:'Other'},{d:'2025-03-14',n:'Other',a:223,w:'Y',c:'Other'},{d:'2025-03-14',n:'Sumanth',a:1800,w:'Y',c:'Transfers'},{d:'2025-03-14',n:'Blinkit',a:524,w:'Y',c:'Groceries'},{d:'2025-03-14',n:'Jio',a:911,w:'Y',c:'Subscriptions'},{d:'2025-03-14',n:'Sumanth',a:1750,w:'Y',c:'Transfers'},{d:'2025-03-14',n:'Sai Kiran',a:360,w:'Y',c:'Transfers'},{d:'2025-03-14',n:'Zakat',a:3000,w:'Y',c:'Donations'},{d:'2025-03-14',n:'Blinkit',a:295,w:'W',c:'Groceries'},
-{d:'2025-03-13',n:'Other',a:500,w:'Y',c:'Other'},{d:'2025-03-13',n:'Meerasaheb',a:1350,w:'W',c:'Transfers'},
-{d:'2025-03-12',n:'IRA Pharmacy',a:662,w:'Y',c:'Healthcare'},{d:'2025-03-12',n:'Amazon',a:504,w:'W',c:'Shopping'},{d:'2025-03-12',n:'Paytm',a:199,w:'Y',c:'Other'},{d:'2025-03-12',n:'Swiggy',a:479,w:'W',c:'Food Delivery'},{d:'2025-03-12',n:'Zomato',a:267,w:'W',c:'Food Delivery'},
-{d:'2025-03-11',n:'Other',a:25,w:'Y',c:'Other'},{d:'2025-03-11',n:'MyGate',a:8000,w:'Y',c:'Rent'},{d:'2025-03-11',n:'Other',a:194,w:'Y',c:'Other'},{d:'2025-03-11',n:'Blinkit',a:229,w:'W',c:'Groceries'},
-{d:'2025-03-10',n:'Prabhakar',a:120,w:'W',c:'Groceries'},{d:'2025-03-10',n:'Pawan',a:160,w:'W',c:'Other'},{d:'2025-03-10',n:'Blinkit',a:359,w:'W',c:'Groceries'},{d:'2025-03-10',n:'Sai Kumar',a:1500,w:'W',c:'Transfers'},{d:'2025-03-10',n:'Aijaz',a:320,w:'W',c:'Transfers'},{d:'2025-03-10',n:'Afroj',a:100,w:'W',c:'Transfers'},{d:'2025-03-10',n:'Other',a:90,w:'W',c:'Other'},{d:'2025-03-10',n:'Mosha',a:30,w:'W',c:'Other'},{d:'2025-03-10',n:'Srinivas',a:30,w:'W',c:'Other'},{d:'2025-03-10',n:'Vignesh',a:30,w:'W',c:'Groceries'},{d:'2025-03-10',n:'Srikanth',a:40,w:'W',c:'Other'},{d:'2025-03-10',n:'Vamshi',a:70,w:'W',c:'Other'},{d:'2025-03-10',n:'Vignesh',a:140,w:'W',c:'Groceries'},
-{d:'2025-03-09',n:'Pista House',a:1400,w:'Y',c:'Food Delivery'},{d:'2025-03-09',n:'Apple',a:389,w:'Y',c:'Subscriptions'},{d:'2025-03-09',n:'Blinkit',a:209,w:'W',c:'Groceries'},{d:'2025-03-09',n:'Other',a:84,w:'Y',c:'Other'},
-{d:'2025-03-08',n:'Swiss Castle',a:535,w:'Y',c:'Food Delivery'},{d:'2025-03-08',n:'Blinkit',a:288,w:'W',c:'Groceries'},{d:'2025-03-08',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},{d:'2025-03-08',n:'Acko',a:1768,w:'Y',c:'Insurance'},
-{d:'2025-03-06',n:'Blinkit',a:309,w:'Y',c:'Groceries'},{d:'2025-03-06',n:'Ramdev',a:100,w:'Y',c:'Other'},{d:'2025-03-06',n:'Zepto',a:395,w:'W',c:'Groceries'},{d:'2025-03-06',n:'Zee',a:299,w:'W',c:'Subscriptions'},{d:'2025-03-06',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},
-{d:'2025-03-05',n:'Blinkit',a:281,w:'Y',c:'Groceries'},{d:'2025-03-05',n:'IRA Pharmacy',a:2560,w:'Y',c:'Healthcare'},{d:'2025-03-05',n:'Supra Fuel',a:510,w:'Y',c:'Fuel'},{d:'2025-03-05',n:'Zomato',a:402,w:'W',c:'Food Delivery'},{d:'2025-03-05',n:'Other',a:50,w:'Y',c:'Other'},{d:'2025-03-05',n:'Blinkit',a:340,w:'W',c:'Groceries'},{d:'2025-03-05',n:'Continental Hospital',a:16659,w:'Y',c:'Healthcare'},{d:'2025-03-05',n:'Zomato',a:382,w:'W',c:'Food Delivery'},{d:'2025-03-05',n:'Petrol',a:3608,w:'Y',c:'Fuel'},{d:'2025-03-05',n:'Zomato',a:269,w:'W',c:'Food Delivery'},
-{d:'2025-03-04',n:'Crocs',a:8990,w:'Y',c:'Shopping'},{d:'2025-03-04',n:'Zomato',a:282,w:'W',c:'Food Delivery'},{d:'2025-03-04',n:'Safiya',a:10000,w:'W',c:'Transfers'},{d:'2025-03-04',n:'Haseena',a:20000,w:'W',c:'Transfers'},{d:'2025-03-04',n:'Zomato',a:453,w:'W',c:'Food Delivery'},{d:'2025-03-04',n:'Raju',a:193,w:'Y',c:'Other'},{d:'2025-03-04',n:'Rao',a:152,w:'Y',c:'Other'},{d:'2025-03-04',n:'Chandrashekar',a:117,w:'Y',c:'Other'},
-{d:'2025-03-03',n:'Kethavath',a:100,w:'W',c:'Other'},{d:'2025-03-03',n:'Kurmaiah',a:80,w:'W',c:'Other'}
+{d:'2026-03-19',n:'Zepto',a:1057,w:'W',c:'Groceries'},{d:'2026-03-19',n:'Apple',a:8700,w:'Y',c:'Subscriptions'},{d:'2026-03-19',n:'Amazon',a:184,w:'W',c:'Shopping'},{d:'2026-03-19',n:'Amazon',a:403,w:'W',c:'Shopping'},{d:'2026-03-19',n:'Paytm',a:170,w:'Y',c:'Other'},{d:'2026-03-19',n:'Ratnadeep',a:407,w:'Y',c:'Groceries'},{d:'2026-03-19',n:'Other',a:160,w:'Y',c:'Other'},{d:'2026-03-19',n:'DMart',a:3119,w:'Y',c:'Groceries'},{d:'2026-03-19',n:'Amazon',a:593,w:'W',c:'Shopping'},{d:'2026-03-19',n:'IRA Pharmacy',a:3387,w:'Y',c:'Healthcare'},{d:'2026-03-19',n:'K Divya Rani',a:500,w:'W',c:'Transfers'},
+{d:'2026-03-18',n:'Swiggy',a:343,w:'W',c:'Food Delivery'},{d:'2026-03-18',n:'Budiuzzama',a:30000,w:'Y',c:'Transfers'},
+{d:'2026-03-17',n:'Bajaj',a:3,w:'Y',c:'Subscriptions'},{d:'2026-03-17',n:'Other',a:50,w:'Y',c:'Other'},{d:'2026-03-17',n:'Blinkit',a:407,w:'W',c:'Groceries'},{d:'2026-03-17',n:'Other',a:985,w:'Y',c:'Other'},{d:'2026-03-17',n:'Blinkit',a:212,w:'W',c:'Groceries'},
+{d:'2026-03-16',n:'Amazon',a:404,w:'W',c:'Shopping'},{d:'2026-03-16',n:'Zomato',a:524,w:'W',c:'Food Delivery'},{d:'2026-03-16',n:'Other',a:50,w:'Y',c:'Other'},{d:'2026-03-16',n:'Amazon',a:1000,w:'Y',c:'Shopping'},{d:'2026-03-16',n:'Blinkit',a:267,w:'W',c:'Groceries'},
+{d:'2026-03-15',n:'Amazon',a:574,w:'W',c:'Shopping'},{d:'2026-03-15',n:'Nammi',a:80,w:'Y',c:'Food Delivery'},{d:'2026-03-15',n:'AbhiBus',a:1,w:'Y',c:'Other'},{d:'2026-03-15',n:'Amazon',a:463,w:'Y',c:'Shopping'},
+{d:'2026-03-14',n:'Parashuram',a:50,w:'W',c:'Other'},{d:'2026-03-14',n:'Other',a:223,w:'Y',c:'Other'},{d:'2026-03-14',n:'Sumanth',a:1800,w:'Y',c:'Transfers'},{d:'2026-03-14',n:'Blinkit',a:524,w:'Y',c:'Groceries'},{d:'2026-03-14',n:'Jio',a:911,w:'Y',c:'Subscriptions'},{d:'2026-03-14',n:'Sumanth',a:1750,w:'Y',c:'Transfers'},{d:'2026-03-14',n:'Sai Kiran',a:360,w:'Y',c:'Transfers'},{d:'2026-03-14',n:'Zakat',a:3000,w:'Y',c:'Donations'},{d:'2026-03-14',n:'Blinkit',a:295,w:'W',c:'Groceries'},
+{d:'2026-03-13',n:'Other',a:500,w:'Y',c:'Other'},{d:'2026-03-13',n:'Meerasaheb',a:1350,w:'W',c:'Transfers'},
+{d:'2026-03-12',n:'IRA Pharmacy',a:662,w:'Y',c:'Healthcare'},{d:'2026-03-12',n:'Amazon',a:504,w:'W',c:'Shopping'},{d:'2026-03-12',n:'Paytm',a:199,w:'Y',c:'Other'},{d:'2026-03-12',n:'Swiggy',a:479,w:'W',c:'Food Delivery'},{d:'2026-03-12',n:'Zomato',a:267,w:'W',c:'Food Delivery'},
+{d:'2026-03-11',n:'Other',a:25,w:'Y',c:'Other'},{d:'2026-03-11',n:'MyGate',a:8000,w:'Y',c:'Rent'},{d:'2026-03-11',n:'Other',a:194,w:'Y',c:'Other'},{d:'2026-03-11',n:'Blinkit',a:229,w:'W',c:'Groceries'},
+{d:'2026-03-10',n:'Prabhakar',a:120,w:'W',c:'Groceries'},{d:'2026-03-10',n:'Pawan',a:160,w:'W',c:'Other'},{d:'2026-03-10',n:'Blinkit',a:359,w:'W',c:'Groceries'},{d:'2026-03-10',n:'Sai Kumar',a:1500,w:'W',c:'Transfers'},{d:'2026-03-10',n:'Aijaz',a:320,w:'W',c:'Transfers'},{d:'2026-03-10',n:'Afroj',a:100,w:'W',c:'Transfers'},{d:'2026-03-10',n:'Other',a:90,w:'W',c:'Other'},{d:'2026-03-10',n:'Mosha',a:30,w:'W',c:'Other'},{d:'2026-03-10',n:'Srinivas',a:30,w:'W',c:'Other'},{d:'2026-03-10',n:'Vignesh',a:30,w:'W',c:'Groceries'},{d:'2026-03-10',n:'Srikanth',a:40,w:'W',c:'Other'},{d:'2026-03-10',n:'Vamshi',a:70,w:'W',c:'Other'},{d:'2026-03-10',n:'Vignesh',a:140,w:'W',c:'Groceries'},
+{d:'2026-03-09',n:'Pista House',a:1400,w:'Y',c:'Food Delivery'},{d:'2026-03-09',n:'Apple',a:389,w:'Y',c:'Subscriptions'},{d:'2026-03-09',n:'Blinkit',a:209,w:'W',c:'Groceries'},{d:'2026-03-09',n:'Other',a:84,w:'Y',c:'Other'},
+{d:'2026-03-08',n:'Swiss Castle',a:535,w:'Y',c:'Food Delivery'},{d:'2026-03-08',n:'Blinkit',a:288,w:'W',c:'Groceries'},{d:'2026-03-08',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},{d:'2026-03-08',n:'Acko',a:1768,w:'Y',c:'Insurance'},
+{d:'2026-03-06',n:'Blinkit',a:309,w:'Y',c:'Groceries'},{d:'2026-03-06',n:'Ramdev',a:100,w:'Y',c:'Other'},{d:'2026-03-06',n:'Zepto',a:395,w:'W',c:'Groceries'},{d:'2026-03-06',n:'Zee',a:299,w:'W',c:'Subscriptions'},{d:'2026-03-06',n:'Airtel',a:500,w:'Y',c:'Subscriptions'},
+{d:'2026-03-05',n:'Blinkit',a:281,w:'Y',c:'Groceries'},{d:'2026-03-05',n:'IRA Pharmacy',a:2560,w:'Y',c:'Healthcare'},{d:'2026-03-05',n:'Supra Fuel',a:510,w:'Y',c:'Fuel'},{d:'2026-03-05',n:'Zomato',a:402,w:'W',c:'Food Delivery'},{d:'2026-03-05',n:'Other',a:50,w:'Y',c:'Other'},{d:'2026-03-05',n:'Blinkit',a:340,w:'W',c:'Groceries'},{d:'2026-03-05',n:'Continental Hospital',a:16659,w:'Y',c:'Healthcare'},{d:'2026-03-05',n:'Zomato',a:382,w:'W',c:'Food Delivery'},{d:'2026-03-05',n:'Petrol',a:3608,w:'Y',c:'Fuel'},{d:'2026-03-05',n:'Zomato',a:269,w:'W',c:'Food Delivery'},
+{d:'2026-03-04',n:'Crocs',a:8990,w:'Y',c:'Shopping'},{d:'2026-03-04',n:'Zomato',a:282,w:'W',c:'Food Delivery'},{d:'2026-03-04',n:'Safiya',a:10000,w:'W',c:'Transfers'},{d:'2026-03-04',n:'Haseena',a:20000,w:'W',c:'Transfers'},{d:'2026-03-04',n:'Zomato',a:453,w:'W',c:'Food Delivery'},{d:'2026-03-04',n:'Raju',a:193,w:'Y',c:'Other'},{d:'2026-03-04',n:'Rao',a:152,w:'Y',c:'Other'},{d:'2026-03-04',n:'Chandrashekar',a:117,w:'Y',c:'Other'},
+{d:'2026-03-03',n:'Kethavath',a:100,w:'W',c:'Other'},{d:'2026-03-03',n:'Kurmaiah',a:80,w:'W',c:'Other'}
+,
+{d:'2026-03-20',n:'Supra Fuel',a:481,w:'Y',c:'Fuel',cc:true},{d:'2026-03-20',n:'Other',a:120,w:'Y',c:'Other',cc:true},{d:'2026-03-20',n:'Shaik Amjad',a:1000,w:'Y',c:'Transfers'},{d:'2026-03-20',n:'Md Dilshad',a:80,w:'Y',c:'Transfers'},
+{d:'2026-03-21',n:'Blinkit',a:574,w:'W',c:'Groceries'},{d:'2026-03-21',n:'Blinkit',a:431,w:'W',c:'Groceries'},{d:'2026-03-21',n:'Blinkit',a:261,w:'W',c:'Groceries'},{d:'2026-03-21',n:'Zepto',a:180,w:'W',c:'Groceries'},{d:'2026-03-21',n:'K Divya Rani',a:500,w:'W',c:'Transfers'},{d:'2026-03-21',n:'Maariful Quran',a:600,w:'Y',c:'Donations'},{d:'2026-03-21',n:'Swiggy',a:483,w:'Y',c:'Food Delivery',cc:true},{d:'2026-03-21',n:'Zomato',a:1427,w:'Y',c:'Food Delivery',cc:true},{d:'2026-03-21',n:'Zomato',a:435,w:'W',c:'Food Delivery'},
+{d:'2026-03-22',n:'Zomato',a:484,w:'W',c:'Food Delivery'},{d:'2026-03-22',n:'Ravi Jarupula',a:800,w:'Y',c:'Transfers'},{d:'2026-03-22',n:'GPay',a:10,w:'Y',c:'Other',cc:true},{d:'2026-03-22',n:'Paytm',a:150,w:'Y',c:'Other',cc:true},{d:'2026-03-22',n:'Blinkit',a:240,w:'W',c:'Groceries'},{d:'2026-03-22',n:'GPay',a:30,w:'Y',c:'Other',cc:true},{d:'2026-03-22',n:'Paytm QR',a:466,w:'Y',c:'Other',cc:true},{d:'2026-03-22',n:'Paytm QR',a:1000,w:'Y',c:'Other',cc:true},{d:'2026-03-22',n:'Haseena',a:50000,w:'W',c:'Transfers'},
+{d:'2026-03-23',n:'Vyapar',a:168,w:'Y',c:'Other',cc:true},{d:'2026-03-23',n:'Paytm',a:20,w:'Y',c:'Other',cc:true},{d:'2026-03-23',n:'Paytm QR',a:4025,w:'Y',c:'Other',cc:true},
+{d:'2026-03-24',n:'K Divya Rani',a:3000,w:'W',c:'Transfers'},{d:'2026-03-24',n:'Ram Prasad',a:530,w:'Y',c:'Transfers'},{d:'2026-03-24',n:'Vyapar',a:84,w:'Y',c:'Other',cc:true},{d:'2026-03-24',n:'Amazon Grocery',a:704,w:'Y',c:'Groceries',cc:true},
+{d:'2026-03-25',n:'Blinkit',a:564,w:'W',c:'Groceries'},{d:'2026-03-25',n:'Suman',a:30,w:'W',c:'Transfers'},{d:'2026-03-25',n:'Vyapar',a:84,w:'Y',c:'Other',cc:true},{d:'2026-03-25',n:'CC',a:15,w:'Y',c:'Other',cc:true},
+{d:'2026-03-26',n:'Swiggy',a:187,w:'W',c:'Food Delivery'},{d:'2026-03-26',n:'Zomato',a:509,w:'W',c:'Food Delivery'},{d:'2026-03-26',n:'IRA Pharmacy',a:320,w:'Y',c:'Healthcare'},{d:'2026-03-26',n:'CC',a:15,w:'Y',c:'Other',cc:true},{d:'2026-03-26',n:'CC',a:25,w:'Y',c:'Other',cc:true}
 ];
 const CATS_COLOR={'Groceries':'#34d399','Shopping':'#818cf8','Food Delivery':'#fb923c','Healthcare':'#f87171','Transfers':'#a78bfa','Subscriptions':'#38bdf8','Rent':'#fbbf24','Donations':'#f472b6','Fuel':'#22d3ee','Insurance':'#a3e635','Other':'#94a3b8'};
 const fmt=v=>'₹'+v.toLocaleString('en-IN');
@@ -140,9 +146,9 @@ function getData(){
  let data=TX;
  if(S.acct==='Yakub')data=data.filter(t=>t.w==='Y');
  else if(S.acct==='Wife')data=data.filter(t=>t.w==='W');
- if(S.period==='today')data=data.filter(t=>t.d==='2025-03-19');
- else if(S.period==='week')data=data.filter(t=>t.d>='2025-03-17'&&t.d<='2025-03-19');
- else if(S.period==='month')data=data.filter(t=>t.d>='2025-03-01'&&t.d<='2025-03-19');
+ if(S.period==='today')data=data.filter(t=>t.d===new Date().toISOString().slice(0,10));
+ else if(S.period==='week'){const now=new Date();const w=new Date(now);w.setDate(now.getDate()-6);const ws=w.toISOString().slice(0,10);const we=now.toISOString().slice(0,10);data=data.filter(t=>t.d>=ws&&t.d<=we)};
+ else if(S.period==='month')data=data.filter(t=>t.d>='2026-03-01'&&t.d<='2026-03-31');
  return data;
 }
 function getByDate(data){
@@ -179,14 +185,14 @@ function renderTab(tab,data){
 }
 function renderDash(data,total,cats,byDate){
  const el=document.getElementById('tc-dash');
- const todayD=byDate['2025-03-19']||[];const yestD=byDate['2025-03-18']||[];
+ const td=new Date().toISOString().slice(0,10);const yd=new Date(Date.now()-864e5).toISOString().slice(0,10);const todayD=byDate[td]||[];const yestD=byDate[yd]||[];
  const todayT=getTotal(todayD),yestT=getTotal(yestD);
  const txCount=data.length;const avgDay=total/Math.max(Object.keys(byDate).length,1);
  const topCat=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
  el.innerHTML=`<div class="stats-grid">
  <div class="card stat-card"><div class="stat-label">Total Spent</div><div class="stat-val">${fmt(total)}</div><div class="stat-sub" style="color:var(--dim)">${txCount} transactions</div></div>
  <div class="card stat-card"><div class="stat-label">Daily Average</div><div class="stat-val">${fmt(Math.round(avgDay))}</div><div class="stat-sub" style="color:var(--dim)">per day</div></div>
- <div class="card stat-card"><div class="stat-label">Today (Mar 19)</div><div class="stat-val">${fmt(todayT)}</div><div class="stat-sub" style="color:${todayT>yestT?'var(--red)':'var(--green)'}">vs ${fmt(yestT)} yesterday</div></div>
+ <div class="card stat-card"><div class="stat-label">Today</div><div class="stat-val">${fmt(todayT)}</div><div class="stat-sub" style="color:${todayT>yestT?'var(--red)':'var(--green)'}">vs ${fmt(yestT)} yesterday</div></div>
  <div class="card stat-card"><div class="stat-label">Top Category</div><div class="stat-val" style="font-size:16px">${topCat?topCat[0]:'—'}</div><div class="stat-sub" style="color:var(--accent)">${topCat?fmt(topCat[1]):''}</div></div>
  </div>
  <div class="section-title">Category Breakdown</div>
@@ -213,7 +219,7 @@ function renderDaily(data,byDate){
 }
 function renderWeekly(data){
  const el=document.getElementById('tc-weekly');
- const weeks=[{label:'Week 1 (Mar 3-9)',start:'2025-03-03',end:'2025-03-09'},{label:'Week 2 (Mar 10-16)',start:'2025-03-10',end:'2025-03-16'},{label:'Week 3 (Mar 17-19)',start:'2025-03-17',end:'2025-03-19'}];
+ const weeks=[{label:'Week 1 (Mar 3-9)',start:'2026-03-03',end:'2026-03-09'},{label:'Week 2 (Mar 10-16)',start:'2026-03-10',end:'2026-03-16'},{label:'Week 3 (Mar 17-23)',start:'2026-03-17',end:'2026-03-23'},{label:'Week 4 (Mar 24-27)',start:'2026-03-24',end:'2026-03-27'}];
  const wData=weeks.map(w=>{const wd=data.filter(t=>t.d>=w.start&&t.d<=w.end);return{...w,total:getTotal(wd),cats:getCats(wd),data:wd}});
  const allCats=[...new Set(data.map(t=>t.c))].sort();
  el.innerHTML=`<div class="compare-row">${wData.map(w=>`<div class="card"><div class="compare-label">${w.label.split('(')[0]}</div><div class="compare-val">${fmt(w.total)}</div><div class="compare-label">${w.data.length} txns</div></div>`).join('')}</div>
@@ -225,7 +231,7 @@ function renderWeekly(data){
 }
 function renderMonthly(data,total,cats){
  const el=document.getElementById('tc-monthly');
- const daysElapsed=19,daysInMonth=31;
+ const daysElapsed=new Date().getDate(),daysInMonth=31;
  const projected=Math.round(total/daysElapsed*daysInMonth);
  const sortedCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
  const merchants={};data.forEach(t=>{merchants[t.n]=(merchants[t.n]||0)+t.a});
